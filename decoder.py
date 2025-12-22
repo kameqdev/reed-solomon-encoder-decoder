@@ -213,6 +213,15 @@ def decode(received_message):# main
         # a padded_msg ma długość 255.
         idx = 254 - pos
         padded_msg[idx] = GF_INSTANCE.add(padded_msg[idx], error_vals[pos]) # Naprawa przez XOR
+    
+    # --- ZABEZPIECZENIE (DODANE) ---
+    # Obliczamy syndromy ponownie dla wiadomości PO naprawie.
+    # Jeśli nadal nie są zerami, to znaczy, że naprawa się nie udała (np. za dużo błędów).
+    check_synd = calculate_syndromes(padded_msg, nsym)
+    if max(check_synd) != 0:
+        raise Exception("Weryfikacja nieudana! Wiadomość po naprawie nadal zawiera błędy (przekroczono zdolność korekcyjną).")
+    # -------------------------------
+
     # 7. Zwracanie wyniku: Obcinamy padding i parzystość
     fixed_msg_with_parity = padded_msg[padding_len:] # Usuwamy zera paddingu
     recovered_data = fixed_msg_with_parity[:-nsym]   # Usuwamy parzystość

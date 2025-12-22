@@ -110,6 +110,17 @@ def decode(received_message): # Główna funkcja dekodująca, interfejs zgodny z
              fixed_msg_shifted_back = cyclic_shift(current_msg, -shifts_performed) # Powrót
         else: # Jeśli trafiliśmy od razu (shift 0)
              fixed_msg_shifted_back = current_msg # Bez zmian
+
+        # =================================================================================
+        # ZABEZPIECZENIE (WYMÓG PROJEKTOWY)
+        # =================================================================================
+        # Sprawdzamy, czy "naprawiona" wiadomość jest poprawnym słowem kodowym.
+        # Przy dużej liczbie błędów (>t) Error Trapping może znaleźć fałszywego kandydata.
+        # Jeśli reszta z dzielenia przez generator nie jest zerem, odrzucamy wynik.
+        check_syndrome = poly_div_remainder(fixed_msg_shifted_back, G_X)
+        if max(check_syndrome) != 0:
+            raise Exception(f"Weryfikacja nieudana! Znaleziono kandydata, ale syndrom nadal niezerowy. (Zbyt wiele błędów?)")
+        # =================================================================================
              
         # Usuwamy padding i parzystość, aby zwrócić czyste dane
         # Uwaga: w Twoim kodzie padding jest na początku, parzystość na końcu
