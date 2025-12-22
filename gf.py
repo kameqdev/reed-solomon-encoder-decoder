@@ -1,6 +1,7 @@
 from tables_generator import init_exp_log_tables
 
 class GF:
+    #wywołujemy tablice z poprzedniej funkcji
     def __init__(self, primitive_polynomial=0x11d, field_size=256):
         self.gf_exp, self.gf_log = init_exp_log_tables(primitive_polynomial, field_size)
         self.primitive_polynomial = primitive_polynomial
@@ -8,7 +9,7 @@ class GF:
         self.max_index = field_size - 1
 
     def add(self, a, b):
-        return a ^ b
+        return a ^ b #XOR
 
     def mul(self, a, b):
         if a == 0 or b == 0:

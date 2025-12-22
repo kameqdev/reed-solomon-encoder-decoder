@@ -6,7 +6,7 @@ Q = 256
 N = Q - 1
 T = 16
 
-GF = GF(P_X, Q)
+GF_CALC = GF(P_X, Q)
 
 def poly_multiply(p, g):
     res = [0] * (len(p) + len(g) - 1)
@@ -16,14 +16,14 @@ def poly_multiply(p, g):
         for j, b in enumerate(g):
             if b == 0:
                 continue
-            res[i + j] = GF.add(res[i + j], GF.mul(a, b))
+            res[i + j] = GF_CALC.add(res[i + j], GF_CALC.mul(a, b))
     return res
 
 def generate_g(t, alpha):
     g = [1]
     
     for i in range(0, 2 * t):
-        p = [1, GF.pow(alpha, i)]
+        p = [1, GF_CALC.pow(alpha, i)]
         g = poly_multiply(p, g)
     return g
 
@@ -43,7 +43,7 @@ def encode(message, g):
         coef = encoded_message[i] # pojedynczy aktualnie  przetwarzany bajt
         if coef != 0:
             for j in range(1, len(g)):
-                encoded_message[i + j] = GF.add(encoded_message[i + j], GF.mul(coef, g[j])) # tworzymy nadmiar 
+                encoded_message[i + j] = GF_CALC.add(encoded_message[i + j], GF_CALC.mul(coef, g[j])) # tworzymy nadmiar 
     
     # Przywracamy oryginalną wiadomość (nadpisujemy część z ilorazem)
     encoded_message[:msg_len] = message
