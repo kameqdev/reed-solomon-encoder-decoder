@@ -1,5 +1,6 @@
 import unittest
 from encoder import encode, G_X
+from config import T
 from reedsolo import RSCodec
 
 
@@ -9,7 +10,7 @@ class TestEncoderComparison(unittest.TestCase):
     def setUp(self):
         """Przygotowanie kodeka reedsolo z tymi samymi parametrami."""
         # T=16 oznacza 16 symboli korekcyjnych (2*T=32 symbole ECC)
-        self.rs_codec = RSCodec(32)  # 32 symbole ECC (2*T)
+        self.rs_codec = RSCodec(2 * T)  # 2*T symboli ECC
         
     def test_empty_message(self):
         """Test dla pustej wiadomości."""
@@ -23,7 +24,7 @@ class TestEncoderComparison(unittest.TestCase):
         
         # Reedsolo zwraca [], a my zwracamy 32 zera - oba są poprawne
         # Akceptujemy oba warianty
-        self.assertTrue(our_result == reedsolo_result or our_result == [0] * 32,
+        self.assertTrue(our_result == reedsolo_result or our_result == [0] * (2 * T),
                         "Wyniki dla pustej wiadomości powinny być poprawne")
     
     def test_single_byte(self):

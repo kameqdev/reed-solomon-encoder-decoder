@@ -1,3 +1,4 @@
+from config import P_X, Q
 from tables_generator import init_exp_log_tables
 
 class GF:
@@ -27,3 +28,5 @@ class GF:
         if a == 0:
             raise ZeroDivisionError(f'Cannot compute inverse of zero in GF({self.field_size})')
         return self.gf_exp[self.max_index - self.gf_log[a]]
+
+GF_CALC = GF(P_X, Q)
