@@ -80,3 +80,29 @@ Proces dekodowania jest znacznie bardziej złożony i składa się z 4 głównyc
     - Wynikiem jest idealnie odtworzony, oryginalny blok $C(x)$.
 
 ---
+
+## Testy
+
+Testy znajdują się w folderze `tests/` i pokrywają różne aspekty działania systemu.
+
+### Lista testów:
+
+1.  **`test_encoder.py`** – Weryfikuje poprawność kodera, porównując jego wyniki ze sprawdzoną biblioteką referencyjną (`reedsolo`).
+2.  **`test_decoder_e2e.py`** – Testy end-to-end (E2E) dla głównego dekodera. Sprawdzają pełny cykl: Kodowanie -> Symulacja błędów -> Dekodowanie, upewniając się, że wiadomość przywracana jest bezbłędnie.
+3.  **`test_mochnacki_decoder_e2e.py`** – Analogiczne testy E2E dla alternatywnego dekodera Mochnackiego.
+
+### Uruchamianie testów:
+
+Aby uruchomić wszystkie testy (z poziomu głównego katalogu):
+
+```bash
+python -m unittest discover tests
+```
+
+Aby uruchomić konkretny plik testowy:
+
+```bash
+python -m unittest tests/test_encoder.py
+python -m unittest tests/test_decoder_e2e.py
+python -m unittest tests/test_mochnacki_decoder_e2e.py
+```
