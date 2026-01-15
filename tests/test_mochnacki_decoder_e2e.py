@@ -85,8 +85,29 @@ class TestMochnackiDecoderIterative(MochnackiDecoderBaseTest):
         except Exception:
             # Wyjątek jest akceptowalny
             pass
+        
+    def test_max_scatter_distance(self):
+        """Test maksymalnej odległości rozproszonych błędów."""
+        max_dist_between_errors = self.packet_len - 2
+        for dist in range(1, max_dist_between_errors):
+            corrupted = self._corrupt_random_values(self.encoded, [0, dist+1])
+            
+            success = False
+            try:
+                decoded, _ = mochnacki_decode(corrupted)
+                if decoded == self.message_bytes:
+                    success = True
+            except Exception:
+                success = False
 
-    def _run_iterative_test(self, name, error_generator, min_guaranteed, is_burst):
+
+            if dist <= 30: # Errors have to be in 32-symbol window to be correctable
+                self.assertTrue(success, f"({self.__class__.__name__}.{self._testMethodName}) Failed at distance between errors: {dist}")
+            if not success:
+                print(f"({self.__class__.__name__}.{self._testMethodName}) Decoder failed at distance between errors: {dist}, stopping further tests.")
+                return
+
+    def _run_iterative_test(self, error_generator, min_guaranteed, is_burst):
         test_method = self._testMethodName
         for errors in range(1, 17):
             # Wybieramy indeksy
@@ -107,28 +128,28 @@ class TestMochnackiDecoderIterative(MochnackiDecoderBaseTest):
                 success = False
 
             if errors <= min_guaranteed:
-                self.assertTrue(success, f"[{name}] ({self.__class__.__name__}.{test_method}) Failed at {errors} errors (Guaranteed threshold: {min_guaranteed})")
+                self.assertTrue(success, f"({self.__class__.__name__}.{test_method}) Failed at {errors} errors (Guaranteed threshold: {min_guaranteed})")
             if not success:
-                print(f"[{name}] ({self.__class__.__name__}.{test_method}) Decoder failed at {errors} errors, stopping further tests.")
+                print(f"({self.__class__.__name__}.{test_method}) Decoder failed at {errors} errors, stopping further tests.")
                 return
 
     def test_iterative_scattered_random(self):
-        self._run_iterative_test("Scattered Random", self._corrupt_random_values, self.SCATTERED_GUARANTEED_THRESHOLD, is_burst=False)
+        self._run_iterative_test(self._corrupt_random_values, self.SCATTERED_GUARANTEED_THRESHOLD, is_burst=False)
 
     def test_iterative_scattered_negation(self):
-        self._run_iterative_test("Scattered Negation", self._corrupt_negation, self.SCATTERED_GUARANTEED_THRESHOLD, is_burst=False)
+        self._run_iterative_test(self._corrupt_negation, self.SCATTERED_GUARANTEED_THRESHOLD, is_burst=False)
 
     def test_iterative_scattered_rotated(self):
-        self._run_iterative_test("Scattered Rotated", self._corrupt_rotated_values, self.SCATTERED_GUARANTEED_THRESHOLD, is_burst=False)
+        self._run_iterative_test(self._corrupt_rotated_values, self.SCATTERED_GUARANTEED_THRESHOLD, is_burst=False)
 
     def test_iterative_burst_random(self):
-        self._run_iterative_test("Burst Random", self._corrupt_random_values, self.BURST_GUARANTEED_THRESHOLD, is_burst=True)
+        self._run_iterative_test(self._corrupt_random_values, self.BURST_GUARANTEED_THRESHOLD, is_burst=True)
 
     def test_iterative_burst_negation(self):
-        self._run_iterative_test("Burst Negation", self._corrupt_negation, self.BURST_GUARANTEED_THRESHOLD, is_burst=True)
+        self._run_iterative_test(self._corrupt_negation, self.BURST_GUARANTEED_THRESHOLD, is_burst=True)
 
     def test_iterative_burst_rotated(self):
-        self._run_iterative_test("Burst Rotated", self._corrupt_rotated_values, self.BURST_GUARANTEED_THRESHOLD, is_burst=True)
+        self._run_iterative_test(self._corrupt_rotated_values, self.BURST_GUARANTEED_THRESHOLD, is_burst=True)
 
 if __name__ == '__main__':
     unittest.main()
