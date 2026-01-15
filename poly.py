@@ -1,4 +1,4 @@
-from encoder import GF_CALC
+from gf import GF_CALC
 
 
 class Poly:
